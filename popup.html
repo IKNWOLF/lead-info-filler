@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lead Info Filler</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 380px;
+      max-height: 600px;
+      overflow-y: auto;
+      background: #0f1117;
+      color: #e8e8e8;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+    }
+
+    body::-webkit-scrollbar { width: 4px; }
+    body::-webkit-scrollbar-track { background: #0f1117; }
+    body::-webkit-scrollbar-thumb { background: #2a2d3a; border-radius: 2px; }
+
+    .header {
+      background: #0f1117;
+      border-bottom: 1px solid #1e2130;
+      padding: 12px 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 10px;
+    }
+
+    .header-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 6px #4ade8088;
+    }
+
+    .header h1 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+
+    .header span {
+      margin-left: auto;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: #444;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 4px;
+      padding-bottom: 0;
+    }
+
+    .tab {
+      padding: 7px 4px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #555;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      letter-spacing: 0.03em;
+      user-select: none;
+    }
+
+    .tab:hover { color: #aaa; }
+
+    .tab.active {
+      color: #4ade80;
+      border-bottom-color: #4ade80;
+    }
+
+    .form-body {
+      padding: 12px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: #4ade80;
+      text-transform: uppercase;
+      margin-top: 10px;
+      margin-bottom: 2px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #1e2130;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    label {
+      font-size: 10px;
+      color: #888;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+
+    input, textarea {
+      background: #161820;
+      border: 1px solid #1e2130;
+      border-radius: 5px;
+      color: #e8e8e8;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      padding: 6px 9px;
+      outline: none;
+      transition: border-color 0.15s;
+      width: 100%;
+      resize: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #4ade8055;
+      background: #1a1d27;
+    }
+
+    input::placeholder, textarea::placeholder { color: #333; }
+    textarea { height: 52px; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .prop-section { display: none; }
+    .prop-section.active { display: contents; }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #1e2130;
+      position: sticky;
+      bottom: 0;
+      background: #0f1117;
+      padding-bottom: 4px;
+    }
+
+    button {
+      padding: 9px;
+      border-radius: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      letter-spacing: 0.02em;
+    }
+
+    #copyBtn { background: #4ade80; color: #0a0c10; }
+    #copyBtn:hover { background: #6ee7a0; transform: translateY(-1px); }
+    #copyBtn:active { transform: translateY(0); }
+
+    #clearBtn { background: #1e2130; color: #888; }
+    #clearBtn:hover { background: #252838; color: #bbb; }
+
+    .toast {
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: #4ade80;
+      color: #0a0c10;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 20px;
+      opacity: 0;
+      transition: all 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-top">
+      <div class="header-dot"></div>
+      <h1>Lead Info Filler</h1>
+      <span>COLD CALLER</span>
+    </div>
+    <div class="tabs">
+      <div class="tab active" data-tab="house">🏠 House</div>
+      <div class="tab" data-tab="land">🌿 Land</div>
+      <div class="tab" data-tab="commercial">🏢 Commercial</div>
+    </div>
+  </div>
+
+  <div class="form-body">
+
+    <!-- SHARED: General -->
+    <div class="section-label">General</div>
+    <div class="field"><label>Dialer Number</label><input type="text" id="dialerNumber" placeholder="e.g. +1 555 000 1234" /></div>
+    <div class="field"><label>Lead Type</label><input type="text" id="leadType" placeholder="e.g. Motivated Seller" /></div>
+    <div class="field"><label>Cold Caller Name</label><input type="text" id="callerName" /></div>
+    <div class="field"><label>Date Submitted</label><input type="text" id="dateSubmitted" /></div>
+
+    <!-- SHARED: Seller Info -->
+    <div class="section-label">Seller Info</div>
+    <div class="field"><label>Address</label><input type="text" id="address" placeholder="Full property address" /></div>
+    <div class="field"><label>Seller's Full Name</label><input type="text" id="sellerName" placeholder="First & Last name" /></div>
+    <div class="field"><label>Phone</label><input type="text" id="phone" placeholder="+1 555 000 0000" /></div>
+    <div class="field"><label>Email</label><input type="text" id="email" placeholder="seller@email.com" /></div>
+    <div class="field"><label>Best Time for Callback</label><input type="text" id="callbackTime" placeholder="e.g. Weekdays after 5pm" /></div>
+
+    <!-- PROPERTY DETAILS: HOUSE -->
+    <div class="prop-section active" id="section-house">
+      <div class="section-label">Property Details — House</div>
+      <div class="field"><label>Property Type</label><input type="text" id="house-propertyType" placeholder="e.g. Single Family, Condo" /></div>
+      <div class="two-col">
+        <div class="field"><label>Bed Count</label><input type="text" id="house-beds" placeholder="e.g. 3" /></div>
+        <div class="field"><label>Bath Count</label><input type="text" id="house-baths" placeholder="e.g. 2" /></div>
+        <div class="field"><label>Sqft</label><input type="text" id="house-sqft" placeholder="e.g. 1400" /></div>
+        <div class="field"><label>Occupancy</label><input type="text" id="house-occupancy" placeholder="Vacant / Occupied" /></div>
+      </div>
+    </div>
+
+    <!-- PROPERTY DETAILS: LAND -->
+    <div class="prop-section" id="section-land">
+      <div class="section-label">Property Details — Land</div>
+      <div class="field"><label>Land Type</label><input type="text" id="land-type" placeholder="e.g. Residential, Agricultural, Raw" /></div>
+      <div class="field"><label>Sqft / Acreage</label><input type="text" id="land-sqft" placeholder="e.g. 5 acres / 21,780 sqft" /></div>
+      <div class="field"><label>Utilities Available</label><input type="text" id="land-utils" placeholder="e.g. Water, Electric, Sewer, None" /></div>
+    </div>
+
+    <!-- PROPERTY DETAILS: COMMERCIAL -->
+    <div class="prop-section" id="section-commercial">
+      <div class="section-label">Property Details — Commercial</div>
+      <div class="field"><label>Type of Business / Property</label><input type="text" id="comm-type" placeholder="e.g. Retail, Office, Warehouse" /></div>
+      <div class="two-col">
+        <div class="field"><label>Sqft</label><input type="text" id="comm-sqft" placeholder="e.g. 3200" /></div>
+        <div class="field"><label>Occupancy</label><input type="text" id="comm-occupancy" placeholder="Vacant / Occupied" /></div>
+      </div>
+      <div class="field"><label>Utilities Available</label><input type="text" id="comm-utils" placeholder="e.g. All / Partial / None" /></div>
+      <div class="field"><label>Condition</label><textarea id="comm-condition" placeholder="Overall condition of the property..."></textarea></div>
+    </div>
+
+    <!-- SHARED: 4 Pillars -->
+    <div class="section-label">4 Pillars</div>
+    <div class="field"><label>1) Condition</label><textarea id="condition" placeholder="Property condition details..."></textarea></div>
+    <div class="field"><label>2) Motivation / Reason for Selling</label><textarea id="motivation" placeholder="Why are they selling?"></textarea></div>
+    <div class="field"><label>3) Timeline</label><input type="text" id="timeline" placeholder="e.g. ASAP, 3 months" /></div>
+    <div class="field"><label>4) Price</label><input type="text" id="price" placeholder="Asking price" /></div>
+
+    <!-- SHARED: Extra -->
+    <div class="section-label">Extra</div>
+    <div class="field"><label>Additional Notes</label><textarea id="notes" placeholder="Anything else worth noting..."></textarea></div>
+    <div class="field"><label>Zillow Link</label><input type="text" id="zillowLink" placeholder="https://zillow.com/..." /></div>
+    <div class="field"><label>Zillow Estimate</label><input type="text" id="zillowEstimate" placeholder="e.g. $220,000" /></div>
+
+    <div class="buttons">
+      <button id="copyBtn">⎘ Copy All</button>
+      <button id="clearBtn">✕ Clear Tab</button>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
