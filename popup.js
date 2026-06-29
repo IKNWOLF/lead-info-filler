@@ -37,7 +37,23 @@ function switchTab(name) {
 
   // Hide condition pillar for land and commercial
   const conditionField = document.getElementById('condition').closest('.field');
-  conditionField.style.display = (name === 'commercial' || name === 'land') ? 'none' : 'flex';
+  const hideCondition = (name === 'commercial' || name === 'land');
+  conditionField.style.display = hideCondition ? 'none' : 'flex';
+
+  // Update pillar numbering based on whether condition is shown
+  const motivationLabel = document.querySelector('label[for="motivation"], #motivation').closest('.field').querySelector('label');
+  const timelineLabel = document.querySelector('label[for="timeline"], #timeline').closest('.field').querySelector('label');
+  const priceLabel = document.querySelector('label[for="price"], #price').closest('.field').querySelector('label');
+
+  if (hideCondition) {
+    motivationLabel.textContent = '1) Motivation / Reason for Selling';
+    timelineLabel.textContent = '2) Timeline';
+    priceLabel.textContent = '3) Price';
+  } else {
+    motivationLabel.textContent = '2) Motivation / Reason for Selling';
+    timelineLabel.textContent = '3) Timeline';
+    priceLabel.textContent = '4) Price';
+  }
 
   // Save active tab
   chrome.storage.local.set({ activeTab: name });
