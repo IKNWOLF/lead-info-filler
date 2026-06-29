@@ -35,9 +35,9 @@ function switchTab(name) {
   document.querySelectorAll('.prop-section').forEach(s => s.classList.remove('active'));
   document.getElementById(`section-${name}`).classList.add('active');
 
-  // Hide condition pillar for commercial (it has its own condition field)
+  // Hide condition pillar for land and commercial
   const conditionField = document.getElementById('condition').closest('.field');
-  conditionField.style.display = name === 'commercial' ? 'none' : 'flex';
+  conditionField.style.display = (name === 'commercial' || name === 'land') ? 'none' : 'flex';
 
   // Save active tab
   chrome.storage.local.set({ activeTab: name });
@@ -100,7 +100,19 @@ Utilities Available: ${v('comm-utils')}
 Condition: ${v('comm-condition')}`;
   }
 
-  const pillarsCondition = currentTab === 'commercial' ? '' : `1) Condition: ${v('condition')}\n`;
+  const includeCondition = currentTab !== 'commercial' && currentTab !== 'land';
+
+  let pillarsText;
+  if (includeCondition) {
+    pillarsText = `1) Condition: ${v('condition')}
+2) Motivation/ Reason for selling: ${v('motivation')}
+3) Timeline: ${v('timeline')}
+4) Price: ${v('price')}`;
+  } else {
+    pillarsText = `1) Motivation/ Reason for selling: ${v('motivation')}
+2) Timeline: ${v('timeline')}
+3) Price: ${v('price')}`;
+  }
 
   const text = `Dialer number: ${v('dialerNumber')}
 Lead Type: ${v('leadType')}
@@ -113,9 +125,7 @@ Email: ${v('email')}
 Best time for a callback: ${v('callbackTime')}
 ${propDetails}
 4 PILLARS
-${pillarsCondition}2) Motivation/ Reason for selling: ${v('motivation')}
-3) Timeline: ${v('timeline')}
-4) Price: ${v('price')}
+${pillarsText}
 Additional Notes: ${v('notes')}
 Zillow Link: ${v('zillowLink')}
 Zillow Estimate: ${v('zillowEstimate')}`;
